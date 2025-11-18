@@ -7,3 +7,6 @@
 [submodule "src/fairino_camera/easy_handeye2/easy_handeye2"]
 	path = src/fairino_camera/easy_handeye2/easy_handeye2
 	url = git://github.com/AcidYoghurt/easy_handeye2
+[submodule "src/fairino_camera/machinery_camera_drive/OrbbecSDK_ROS2"]
+	path = src/fairino_camera/machinery_camera_drive/OrbbecSDK_ROS2
+	url = git://github.com/orbbec/OrbbecSDK_ROS2.git
