@@ -1,0 +1,23 @@
+moveit_setup_assistant_config:
+  urdf:
+    package: fr5_v6_robot
+    relative_path: urdf/fr5_v6_robot.urdf
+  srdf:
+    relative_path: config/fr5_v6_robot.srdf
+  package_settings:
+    author_name: yoghurt
+    author_email: 1310946137@qq.com
+    generated_timestamp: 1763031395
+  control_xacro:
+    command:
+      - position
+    state:
+      - position
+  modified_urdf:
+    xacros:
+      - control_xacro
+  control_xacro:
+    command:
+      - position
+    state:
+      - position

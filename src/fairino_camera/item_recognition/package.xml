@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>item_recognition</name>
+  <version>0.0.0</version>
+  <description>TODO: Package description</description>
+  <maintainer email="1310946137@qq.com">amiya</maintainer>
+  <license>TODO: License declaration</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <!--需要的依赖全部扔到这里-->
+  <depend>OpenCV</depend>
+  <depend>cv_bridge</depend>
+  <depend>Eigen3</depend>
+  <depend>rclcpp</depend>
+  <depend>sensor_msgs</depend>
+  <depend>std_msgs</depend>
+  <depend>tf2_ros</depend>
+  <depend>tf2_geometry_msgs</depend>
+  <depend>fairino_msg</depend>
+  <depend>aruco_msgs</depend>
+  <depend>moveit_visual_tools</depend>
+  <depend>moveit_task_constructor_core</depend>
+
+  <test_depend>ament_lint_auto</test_depend>
+  <test_depend>ament_lint_common</test_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

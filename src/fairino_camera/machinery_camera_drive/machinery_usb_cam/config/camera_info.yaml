@@ -1,0 +1,55 @@
+# 黄聪的相机
+image_width: 640
+image_height: 480
+camera_name: narrow_stereo
+camera_matrix:
+  rows: 3
+  cols: 3
+  data: [633.95283,   0.     , 223.38868,
+         0.     , 633.10911, 244.95186,
+         0.     ,   0.     ,   1.     ]
+distortion_model: plumb_bob
+distortion_coefficients:
+  rows: 1
+  cols: 5
+  data: [-0.359406, 0.116669, 0.001267, -0.000538, 0.000000]
+rectification_matrix:
+  rows: 3
+  cols: 3
+  data: [1., 0., 0.,
+         0., 1., 0.,
+         0., 0., 1.]
+projection_matrix:
+  rows: 3
+  cols: 4
+  data: [543.23248,   0.     , 200.72306,   0.     ,
+         0.     , 596.85895, 245.48465,   0.     ,
+         0.     ,   0.     ,   1.     ,   0.     ]
+
+# 垃圾树胶相机
+#image_width: 640
+#image_height: 480
+#camera_name: narrow_stereo
+#camera_matrix:
+#  rows: 3
+#  cols: 3
+#  data: [618.902283,   0.     , 331.813245,
+#         0.     , 618.063498, 240.074849,
+#         0.     ,   0.     ,   1.     ]
+#distortion_model: plumb_bob
+#distortion_coefficients:
+#  rows: 1
+#  cols: 5
+#  data: [-0.345734, 0.143100, -0.001771, 0.000504, 0.000000]
+#rectification_matrix:
+#  rows: 3
+#  cols: 3
+#  data: [1., 0., 0.,
+#         0., 1., 0.,
+#         0., 0., 1.]
+#projection_matrix:
+#  rows: 3
+#  cols: 4
+#  data: [556.909485,   0.     , 334.312639,   0.     ,
+#         0.     , 583.233459, 238.964796,   0.     ,
+#         0.     ,   0.     ,   1.     ,   0.     ]

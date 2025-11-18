@@ -1,0 +1,738 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- This URDF was automatically created by SolidWorks to URDF Exporter! Originally created by Stephen Brawner (brawner@gmail.com) 
+     Commit Version: 1.6.0-4-g7f85cfe  Build Version: 1.6.7995.38578
+     For more information, please see http://wiki.ros.org/sw_urdf_exporter -->
+<robot
+  name="fr5_v6_robot">
+  <link
+    name="base_link">
+    <inertial>
+      <origin
+        xyz="-0.000318961542600387 -0.000296737717779892 0.0424634245004597"
+        rpy="0 0 0" />
+      <mass
+        value="0.599445417287269" />
+      <inertia
+        ixx="0.00114206015555035"
+        ixy="5.68658500957097E-06"
+        ixz="-7.15385999297907E-06"
+        iyy="0.00114168264685438"
+        iyz="-6.63619940037597E-06"
+        izz="0.00167440708353385" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://fr5_v6_robot/meshes/base_link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="1 1 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://fr5_v6_robot/meshes/base_link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <link
+    name="shoulder_link">
+    <inertial>
+      <origin
+        xyz="2.54043425362496E-07 -0.00409176706424021 0.0722911216368655"
+        rpy="0 0 0" />
+      <mass
+        value="1.62117661509796" />
+      <inertia
+        ixx="0.00397249991511541"
+        ixy="-3.09810992717814E-08"
+        ixz="-4.30264034027306E-08"
+        iyy="0.00385298467188772"
+        iyz="4.76738787681127E-05"
+        izz="0.00302838872937248" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://fr5_v6_robot/meshes/shoulder_link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="1 1 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://fr5_v6_robot/meshes/shoulder_link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="j1"
+    type="revolute">
+    <origin
+      xyz="0 0 0.074"
+      rpy="0 0 0" />
+    <parent
+      link="base_link" />
+    <child
+      link="shoulder_link" />
+    <axis
+      xyz="0 0 -1" />
+    <limit
+      lower="-3.0543"
+      upper="3.0543"
+      effort="150"
+      velocity="3.15" />
+  </joint>
+  <link
+    name="upperarm_link">
+    <inertial>
+      <origin
+        xyz="-0.212492915234175 -7.09008485733076E-06 0.0746076465066917"
+        rpy="0 0 0" />
+      <mass
+        value="5.35538518988877" />
+      <inertia
+        ixx="0.0105143686812902"
+        ixy="4.03892194319973E-07"
+        ixz="9.35359559047643E-08"
+        iyy="0.168839311065467"
+        iyz="2.38737767271166E-07"
+        izz="0.166558529797768" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://fr5_v6_robot/meshes/upperarm_link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="1 1 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://fr5_v6_robot/meshes/upperarm_link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="j2"
+    type="revolute">
+    <origin
+      xyz="0 -0.06 0.078005"
+      rpy="1.5708 0 0" />
+    <parent
+      link="shoulder_link" />
+    <child
+      link="upperarm_link" />
+    <axis
+      xyz="0 0 -1" />
+    <limit
+      lower="-4.6251"
+      upper="1.4835"
+      effort="150"
+      velocity="3.15" />
+  </joint>
+  <link
+    name="forearm_link">
+    <inertial>
+      <origin
+        xyz="-0.187931222675284 -5.17729732432692E-06 -0.0533677888533835"
+        rpy="0 0 0" />
+      <mass
+        value="2.84231321100963" />
+      <inertia
+        ixx="0.00296927042140079"
+        ixy="5.71522618658912E-11"
+        ixz="0.000105169138884858"
+        iyy="0.024171129447344"
+        iyz="1.6510607434085E-08"
+        izz="0.0239201895483026" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://fr5_v6_robot/meshes/forearm_link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="1 1 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://fr5_v6_robot/meshes/forearm_link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="j3"
+    type="revolute">
+    <origin
+      xyz="-0.425 0 0"
+      rpy="0 0 0" />
+    <parent
+      link="upperarm_link" />
+    <child
+      link="forearm_link" />
+    <axis
+      xyz="0 0 1" />
+    <limit
+      lower="-2.8274"
+      upper="2.8274"
+      effort="150"
+      velocity="3.15" />
+  </joint>
+  <link
+    name="wrist1_link">
+    <inertial>
+      <origin
+        xyz="9.61744409666565E-07 -0.00373727630077075 0.0388569692322945"
+        rpy="0 0 0" />
+      <mass
+        value="0.602619088313916" />
+      <inertia
+        ixx="0.000799558602001568"
+        ixy="-6.61348687929575E-10"
+        ixz="1.56140147598554E-08"
+        iyy="0.00057218778493398"
+        iyz="1.39689728505921E-05"
+        izz="0.0007366846106067" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://fr5_v6_robot/meshes/wrist1_link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="1 1 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://fr5_v6_robot/meshes/wrist1_link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="j4"
+    type="revolute">
+    <origin
+      xyz="-0.39499 0 -0.0018"
+      rpy="0 0 0" />
+    <parent
+      link="forearm_link" />
+    <child
+      link="wrist1_link" />
+    <axis
+      xyz="0 0 -1" />
+    <limit
+      lower="-4.6251"
+      upper="1.4835"
+      effort="28"
+      velocity="3.2" />
+  </joint>
+  <link
+    name="wrist2_link">
+    <inertial>
+      <origin
+        xyz="-9.88925088596382E-07 0.00384438406606774 0.0400593085942963"
+        rpy="0 0 0" />
+      <mass
+        value="0.585831199618643" />
+      <inertia
+        ixx="0.000762973926836359"
+        ixy="-7.44253657922067E-10"
+        ixz="-1.63614965173779E-08"
+        iyy="0.00053598386135184"
+        iyz="-1.0573265148968E-05"
+        izz="0.000724499807646577" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://fr5_v6_robot/meshes/wrist2_link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="1 1 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://fr5_v6_robot/meshes/wrist2_link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="j5"
+    type="revolute">
+    <origin
+      xyz="0 -0.0582 0.0438"
+      rpy="1.5708 0 0" />
+    <parent
+      link="wrist1_link" />
+    <child
+      link="wrist2_link" />
+    <axis
+      xyz="0 0 -1" />
+    <limit
+      lower="-3.0543"
+      upper="3.0543"
+      effort="28"
+      velocity="3.2" />
+  </joint>
+  <link
+    name="wrist3_link">
+    <inertial>
+      <origin
+        xyz="1.02905081019733E-05 -0.0011010742373334 0.0388922369262"
+        rpy="0 0 0" />
+      <mass
+        value="0.298930155859966" />
+      <inertia
+        ixx="0.000153323657274279"
+        ixy="1.28980332451716E-07"
+        ixz="-2.24502990433706E-07"
+        iyy="0.000160212542519835"
+        iyz="-1.13634738846193E-06"
+        izz="0.000216594365084739" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://fr5_v6_robot/meshes/wrist3_link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="1 1 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://fr5_v6_robot/meshes/wrist3_link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="j6"
+    type="revolute">
+    <origin
+      xyz="0 0.0582 0.0438"
+      rpy="-1.5708 0 0" />
+    <parent
+      link="wrist2_link" />
+    <child
+      link="wrist3_link" />
+    <axis
+      xyz="0 0 -1" />
+    <limit
+      lower="-3.0543"
+      upper="3.0543"
+      effort="28"
+      velocity="3.2" />
+  </joint>
+  <link
+    name="gripper_link1_left">
+    <inertial>
+      <origin
+        xyz="0.00861879642773866 -0.00692892768995967 -0.0138491969037787"
+        rpy="0 0 0" />
+      <mass
+        value="0.011093636660722" />
+      <inertia
+        ixx="1.08934890488146E-06"
+        ixy="9.14784315436547E-07"
+        ixz="-2.72327027270803E-07"
+        iyy="3.7244617985658E-06"
+        iyz="-3.30196602144741E-08"
+        izz="4.12126588200292E-06" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://fr5_v6_robot/meshes/gripper_link1_left.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="1 1 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://fr5_v6_robot/meshes/gripper_link1_left.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="gripper_joint1_left"
+    type="revolute">
+    <origin
+      xyz="0.025 0.01295 0.1377"
+      rpy="-1.5708 0 0" />
+    <parent
+      link="wrist3_link" />
+    <child
+      link="gripper_link1_left" />
+    <limit
+      lower="-1.026"
+      upper="0.0"
+      effort="0.0"
+      velocity="0.0" />
+    <axis
+      xyz="0 0 1" />
+  </joint>
+  <link
+    name="gripper_link3_left">
+    <inertial>
+      <origin
+        xyz="-0.014334790338123 0.0267713170536268 0.00950100988902113"
+        rpy="0 0 0" />
+      <mass
+        value="0.010606965856657" />
+      <inertia
+        ixx="2.21321677437824E-06"
+        ixy="3.74961617991863E-07"
+        ixz="-8.78418529092171E-13"
+        iyy="4.64511110876489E-07"
+        iyz="3.35600108017678E-12"
+        izz="2.12521562895475E-06" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://fr5_v6_robot/meshes/gripper_link3_left.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="1 1 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://fr5_v6_robot/meshes/gripper_link3_left.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="gripper_joint3_left"
+    type="continuous">
+    <origin
+      xyz="0.045648 -0.026931 -0.00345"
+      rpy="3.1416 0 0" />
+    <parent
+      link="gripper_link1_left" />
+    <child
+      link="gripper_link3_left" />
+    <axis
+      xyz="0 0 1" />
+    <mimic
+      joint="gripper_joint1_left"
+      multiplier="1"
+      offset="0" />
+  </joint>
+  <link
+    name="gripper_link2_left">
+    <inertial>
+      <origin
+        xyz="0.0178239345820016 -0.0105147724306264 -0.0127148556432755"
+        rpy="0 0 0" />
+      <mass
+        value="0.00620002211597296" />
+      <inertia
+        ixx="7.9560070463818E-07"
+        ixy="7.00601361842959E-07"
+        ixz="-3.75396894165927E-12"
+        iyy="1.56948221841704E-06"
+        iyz="3.08077226459159E-12"
+        izz="1.65589855616728E-06" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://fr5_v6_robot/meshes/gripper_link2_left.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="1 1 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://fr5_v6_robot/meshes/gripper_link2_left.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="gripper_joint2_left"
+    type="continuous">
+    <origin
+      xyz="0.0115 0.01295 0.1577"
+      rpy="-1.5708 0 0" />
+    <parent
+      link="wrist3_link" />
+    <child
+      link="gripper_link2_left" />
+    <axis
+      xyz="0 0 1" />
+    <mimic
+      joint="gripper_joint1_left"
+      multiplier="1"
+      offset="0" />
+  </joint>
+  <link
+    name="gripper_link1_right">
+    <inertial>
+      <origin
+        xyz="-0.0086188 0.0069289 0.011788"
+        rpy="0 0 0" />
+      <mass
+        value="0.011094" />
+      <inertia
+        ixx="1.0893E-06"
+        ixy="9.1478E-07"
+        ixz="2.7233E-07"
+        iyy="3.7245E-06"
+        iyz="3.302E-08"
+        izz="4.1213E-06" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://fr5_v6_robot/meshes/gripper_link1_right.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="1 1 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://fr5_v6_robot/meshes/gripper_link1_right.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="gripper_joint1_right"
+    type="continuous">
+    <origin
+      xyz="-0.025 0.01295 0.1377"
+      rpy="1.5708 0 0" />
+    <parent
+      link="wrist3_link" />
+    <child
+      link="gripper_link1_right" />
+    <axis
+      xyz="0 0 1" />
+    <mimic
+      joint="gripper_joint1_left"
+      multiplier="1"
+      offset="0" />
+  </joint>
+  <link
+    name="gripper_link3_right">
+    <inertial>
+      <origin
+        xyz="0.014421 -0.02676 -0.010499"
+        rpy="0 0 0" />
+      <mass
+        value="0.010771" />
+      <inertia
+        ixx="2.2138E-06"
+        ixy="3.7495E-07"
+        ixz="8.7931E-13"
+        iyy="4.6637E-07"
+        iyz="-3.3563E-12"
+        izz="2.1271E-06" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://fr5_v6_robot/meshes/gripper_link3_right.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="1 1 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://fr5_v6_robot/meshes/gripper_link3_right.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="gripper_joint3_right"
+    type="continuous">
+    <origin
+      xyz="-0.045648 0.026931 0.00245"
+      rpy="-3.1416 0 0" />
+    <parent
+      link="gripper_link1_right" />
+    <child
+      link="gripper_link3_right" />
+    <axis
+      xyz="0 0 1" />
+    <mimic
+      joint="gripper_joint1_left"
+      multiplier="1"
+      offset="0" />
+  </joint>
+  <link
+    name="gripper_link2_right">
+    <inertial>
+      <origin
+        xyz="-0.017824 0.010515 0.012715"
+        rpy="0 0 0" />
+      <mass
+        value="0.0062" />
+      <inertia
+        ixx="7.956E-07"
+        ixy="7.006E-07"
+        ixz="3.754E-12"
+        iyy="1.5695E-06"
+        iyz="-3.0808E-12"
+        izz="1.6559E-06" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://fr5_v6_robot/meshes/gripper_link2_right.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="1 1 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://fr5_v6_robot/meshes/gripper_link2_right.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="gripper_joint2_right"
+    type="continuous">
+    <origin
+      xyz="-0.0115 0.01295 0.1577"
+      rpy="1.5708 0 0" />
+    <parent
+      link="wrist3_link" />
+    <child
+      link="gripper_link2_right" />
+    <axis
+      xyz="0 0 1" />
+    <mimic
+      joint="gripper_joint1_left"
+      multiplier="1"
+      offset="0" />
+  </joint>
+</robot>

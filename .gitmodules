@@ -1,0 +1,9 @@
+[submodule "src/fairino_camera/easy_handeye2/aruco_ros"]
+	path = src/fairino_camera/easy_handeye2/aruco_ros
+	url = git://github.com/AcidYoghurt/aruco_ros.git
+[submodule "src/fairino_camera/easy_handeye2/easy_handeye2_demo"]
+	path = src/fairino_camera/easy_handeye2/easy_handeye2_demo
+	url = git://github.com/AcidYoghurt/easy_handeye2_demo
+[submodule "src/fairino_camera/easy_handeye2/easy_handeye2"]
+	path = src/fairino_camera/easy_handeye2/easy_handeye2
+	url = git://github.com/AcidYoghurt/easy_handeye2

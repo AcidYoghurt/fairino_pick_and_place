@@ -1,0 +1,5 @@
+# 请求部分
+---
+# 响应部分
+std_msgs/String item_id
+std_msgs/String car_id

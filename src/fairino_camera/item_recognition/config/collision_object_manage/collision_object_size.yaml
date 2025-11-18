@@ -1,0 +1,4 @@
+/**:
+  ros__parameters:
+    box_WDH: [0.5,0.2,0.1]  # box的xyz分别对应wdh
+    car_WDH: [1.0,2.0,0.5]
