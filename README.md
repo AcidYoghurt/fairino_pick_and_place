@@ -1,3 +1,11 @@
+# 拉取项目
+- Ubuntu 22.04 的
+- ROS： humble
+```bash
+git clone --recursive https://github.com/AcidYoghurt/fairino_pick_and_place.git
+```
+
+
 # 机械臂抓取流程
 ## 流程
 - 入柜 —— 抓取
