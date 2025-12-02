@@ -12,8 +12,10 @@
   <depend>rclcpp</depend>
   <depend>tf2</depend>
   <depend>tf2_ros</depend>
+  <depend>tf2_geometry_msgs</depend>
   <depend>message_filters</depend>
   <depend>fairino_msg</depend>
+  <depend>fairino_msgs</depend>
   <depend>sensor_msgs</depend>
   <depend>geometry_msgs</depend>
   <depend>moveit_ros_planning_interface</depend>

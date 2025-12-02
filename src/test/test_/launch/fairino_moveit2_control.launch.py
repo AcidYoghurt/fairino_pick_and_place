@@ -1,7 +1,8 @@
 from launch import LaunchDescription
-from launch.substitutions import LaunchConfiguration
+from launch.substitutions import LaunchConfiguration, PathJoinSubstitution
 from launch.actions import DeclareLaunchArgument, OpaqueFunction
 from launch_ros.actions import Node
+from launch_ros.substitutions import FindPackageShare
 from moveit_configs_utils import MoveItConfigsBuilder
 
 def declare_parameters():
@@ -11,13 +12,19 @@ def declare_parameters():
         description="是否使用仿真时间"
     )
 
+    meshes_path_param = DeclareLaunchArgument(
+        'meshes_path_',
+        default_value=PathJoinSubstitution([FindPackageShare('test_'),'meshes']),
+        description='config目录路径'
+    )
+
     robot_name_param = DeclareLaunchArgument(
         'robot_name',
         default_value='fairino5',
         description="机器人名称"
     )
 
-    return [robot_name_param,use_sim_time_param]
+    return [robot_name_param,meshes_path_param,use_sim_time_param]
 
 def mtc_node(context):
     robot_name = context.launch_configurations['robot_name']
@@ -29,7 +36,8 @@ def mtc_node(context):
         output="screen",
         parameters=[
             moveit_config,
-            {'use_sim_time': LaunchConfiguration('use_sim_time')}
+            {'use_sim_time': LaunchConfiguration('use_sim_time'),
+             'meshes_path_': LaunchConfiguration('meshes_path_')}
         ],
     )
 

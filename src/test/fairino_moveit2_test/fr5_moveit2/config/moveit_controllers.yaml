@@ -8,7 +8,6 @@ moveit_simple_controller_manager:
     - hand_controller
 
   arm_controller:
-    action_ns: follow_joint_trajectory
     type: FollowJointTrajectory
     joints:
       - j1
@@ -17,8 +16,9 @@ moveit_simple_controller_manager:
       - j4
       - j5
       - j6
-  hand_controller:
     action_ns: follow_joint_trajectory
+  hand_controller:
     type: FollowJointTrajectory
     joints:
       - gripper_joint1_left
+    action_ns: follow_joint_trajectory

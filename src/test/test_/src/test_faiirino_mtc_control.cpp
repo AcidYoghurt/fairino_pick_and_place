@@ -9,6 +9,7 @@
 #include <moveit/task_constructor/solvers.h>
 #include <moveit/task_constructor/stages.h>
 #include <moveit/robot_model_loader/robot_model_loader.h>
+#include <geometric_shapes/shape_operations.h>
 #include <nlohmann/json.hpp>
 namespace mtc = moveit::task_constructor;
 
@@ -17,7 +18,10 @@ class TestFaitinoMoveit2Control : public rclcpp::Node
 public:
     TestFaitinoMoveit2Control(const rclcpp::NodeOptions& options):Node("TestFaitinoMoveit2ControlNode",options)
     {
+        config_path = this->get_parameter("meshes_path_").as_string();
+
         // 变量
+        cabinet_wdh = std::vector<double>(3);
         move_group_interface_ = nullptr;
         robot_name = "fairino5";
         arm_group_name = robot_name+"_v6_group";
@@ -27,6 +31,7 @@ public:
         tf_buffer  = std::make_shared<tf2_ros::Buffer>(this->get_clock());
         tf_listener = std::make_shared<tf2_ros::TransformListener>(*tf_buffer);
         cabinet_points_sub_ = this->create_subscription<std_msgs::msg::String>("cabinet/points",10,std::bind(&TestFaitinoMoveit2Control::cabinet_points_sub_callback,this,std::placeholders::_1));
+        RCLCPP_INFO(this->get_logger(),"初始化");
     }
 
     void add_collision()
@@ -101,33 +106,65 @@ public:
             rclcpp::sleep_for(std::chrono::milliseconds(500));
         }
 
+        // {
+        //     // 创建碰撞物体
+        //     moveit_msgs::msg::CollisionObject collision_object;
+        //
+        //     collision_object.id = "cabinet";
+        //     collision_object.header.frame_id = "world";
+        //
+        //     // 定义形状
+        //     shape_msgs::msg::SolidPrimitive primitive;
+        //     primitive.type = shape_msgs::msg::SolidPrimitive::BOX;
+        //     primitive.dimensions = {0.10, 0.10, 0.04};
+        //     collision_object.primitives.push_back(primitive);
+        //
+        //
+        //     // 定义位姿
+        //     geometry_msgs::msg::Pose box_pose;
+        //     box_pose.position.x = 0.4;
+        //     box_pose.position.y = 0.4;
+        //     box_pose.position.z = 0.4;
+        //     tf2::Quaternion orientation;
+        //     orientation.setRPY(0, 0, 0);
+        //     box_pose.orientation = tf2::toMsg(orientation);
+        //     collision_object.pose = box_pose;
+        //
+        //     geometry_msgs::msg::Pose primitive_pose;
+        //     primitive_pose.orientation.w = 1.0;
+        //     collision_object.primitive_poses.push_back(primitive_pose);
+        //
+        //     // 添加到场景
+        //     collision_object.operation = collision_object.ADD;
+        //     psi.applyCollisionObject(collision_object);
+        //     rclcpp::sleep_for(std::chrono::milliseconds(500));
+        // }
+
         {
-            // 创建碰撞物体
+            // 加载STL文件并创建网格
+            shapes::Mesh* m = shapes::createMeshFromResource(
+                "package://test_/meshes/cabinet.STL",
+                Eigen::Vector3d(0.001, 0.001, 0.001));
+            shape_msgs::msg::Mesh mesh;
+            shapes::ShapeMsg mesh_msg;
+            shapes::constructMsgFromShape(m,mesh_msg);
+            mesh = boost::get<shape_msgs::msg::Mesh>(mesh_msg);
+
+            // 定义object
             moveit_msgs::msg::CollisionObject collision_object;
-
-            collision_object.id = "cabinet";
             collision_object.header.frame_id = "world";
-
-            // 定义形状
-            shape_msgs::msg::SolidPrimitive primitive;
-            primitive.type = shape_msgs::msg::SolidPrimitive::BOX;
-            primitive.dimensions = {0.10, 0.10, 0.04};
-            collision_object.primitives.push_back(primitive);
-
+            collision_object.id="cabinet";
+            collision_object.meshes.push_back(mesh);
 
             // 定义位姿
             geometry_msgs::msg::Pose box_pose;
             box_pose.position.x = 0.4;
-            box_pose.position.y = 0.4;
-            box_pose.position.z = 0.4;
+            box_pose.position.y = 0.4-0.030;
+            box_pose.position.z = 0.4-0.025;
             tf2::Quaternion orientation;
             orientation.setRPY(0, 0, 0);
             box_pose.orientation = tf2::toMsg(orientation);
             collision_object.pose = box_pose;
-
-            geometry_msgs::msg::Pose primitive_pose;
-            primitive_pose.orientation.w = 1.0;
-            collision_object.primitive_poses.push_back(primitive_pose);
 
             // 添加到场景
             collision_object.operation = collision_object.ADD;
@@ -320,16 +357,16 @@ public:
                         lift_item_stage->setDirection(lift_position);
                         task->add(std::move(lift_item_stage));
                     }
-                    {   // 放置物体
+                    {   // 移动到柜子前面
                         auto move_to_item_stage = std::make_unique<mtc::stages::MoveTo>("place item",sampling_planner);
                         move_to_item_stage->setGroup(arm_group_name);
                         move_to_item_stage->setIKFrame(hand_frame);
 
                         geometry_msgs::msg::PoseStamped target_pose;
                         target_pose.header.frame_id = "world";
-                        target_pose.pose.position.x = cabinet_point[0]-0.1;
-                        target_pose.pose.position.y = cabinet_point[1];
-                        target_pose.pose.position.z = cabinet_point[2]+0.05;
+                        target_pose.pose.position.x = cabinet_point[0]+obj.primitives[0].dimensions[shape_msgs::msg::SolidPrimitive::BOX_Z];
+                        target_pose.pose.position.y = cabinet_point[1]+cabinet_wdh[0]/2;
+                        target_pose.pose.position.z = cabinet_point[2]+obj.primitives[0].dimensions[shape_msgs::msg::SolidPrimitive::BOX_X]/2+0.02;
 
                         tf2::Quaternion temp;
                         temp.setRPY(-M_PI/2, 0, -M_PI/2);
@@ -338,17 +375,18 @@ public:
                         move_to_item_stage->setGoal(target_pose);
                         task->add(std::move(move_to_item_stage));
                     }
-                    {   // 向前移动
-                        auto stage = std::make_unique<mtc::stages::MoveRelative>("move forward",cartesian_planner);
-                        stage->setGroup(arm_group_name);
-                        stage->setIKFrame(hand_frame);
-
-                        geometry_msgs::msg::Vector3Stamped vector;
-                        vector.header.frame_id = "world";
-                        vector.vector.x = 0.1;
-                        stage->setDirection(vector);
-                        task->add(std::move(stage));
-                    }
+                    // {   // 向前移动
+                    //     auto stage = std::make_unique<mtc::stages::MoveRelative>("move forward",cartesian_planner);
+                    //     stage->setMinMaxDistance(0.05,obj.primitives[0].dimensions[shape_msgs::msg::SolidPrimitive::BOX_X]);
+                    //     stage->setGroup(arm_group_name);
+                    //     stage->setIKFrame(hand_frame);
+                    //
+                    //     geometry_msgs::msg::Vector3Stamped vector;
+                    //     vector.header.frame_id = "world";
+                    //     vector.vector.x = 1;
+                    //     stage->setDirection(vector);
+                    //     task->add(std::move(stage));
+                    // }
                     {   // 打开夹爪
                         auto open_gripper_stage =  std::make_unique<mtc::stages::MoveTo>("open gripper again",interpolation_planner);
                         open_gripper_stage->setGroup(hand_group_name);
@@ -438,9 +476,9 @@ public:
 
                         geometry_msgs::msg::PoseStamped target_pose;
                         target_pose.header.frame_id = "world";
-                        target_pose.pose.position.x = cabinet_point[0]-0.05;
-                        target_pose.pose.position.y = cabinet_point[1];
-                        target_pose.pose.position.z = cabinet_point[2]+0.05;
+                        target_pose.pose.position.x = cabinet_point[0]-cabinet_wdh[1]/2;
+                        target_pose.pose.position.y = cabinet_point[1]+cabinet_wdh[0]/2;
+                        target_pose.pose.position.z = cabinet_point[2]+cabinet_wdh[2]/2;
 
                         tf2::Quaternion temp;
                         temp.setRPY(-M_PI/2, 0, -M_PI/2);
@@ -597,7 +635,7 @@ public:
                         auto lift_item_stage = std::make_unique<mtc::stages::MoveRelative>("lift object",cartesian_planner);
                         lift_item_stage->setGroup(arm_group_name);
                         lift_item_stage->setIKFrame(hand_frame);
-                        lift_item_stage->setMinMaxDistance(0.05, (cabinet_point[2]-object_pose.position.z)/2);
+                        lift_item_stage->setMinMaxDistance(0.05, cabinet_wdh[2]-obj.primitives[0].dimensions[shape_msgs::msg::SolidPrimitive::BOX_Z]);
 
                         geometry_msgs::msg::Vector3Stamped lift_position;
                         lift_position.header.frame_id = "world";
@@ -609,7 +647,7 @@ public:
                         auto item_backward_stage = std::make_unique<mtc::stages::MoveRelative>("object backward",sampling_planner);
                         item_backward_stage->setGroup(arm_group_name);
                         item_backward_stage->setIKFrame(hand_frame);
-                        item_backward_stage->setMinMaxDistance(0.05, 0.2/2+0.05);  //TODO:改为柜子的深度
+                        item_backward_stage->setMinMaxDistance(cabinet_wdh[1]/2, cabinet_wdh[1]/2+0.05);  //TODO:改为柜子的深度
 
                         geometry_msgs::msg::Vector3Stamped lift_position;
                         lift_position.header.frame_id = hand_frame;
@@ -713,7 +751,13 @@ private:
             try
             {
                 nlohmann::json j = nlohmann::json::parse(msg.data);
-                for (auto& [key_str, point_array] : j.items())
+                auto wdh = j["cabinet_wdh"];
+                cabinet_wdh[0] = wdh[0];
+                cabinet_wdh[1] = wdh[1];
+                cabinet_wdh[2] = wdh[2];
+
+                auto points = j["cabinet_points"];
+                for (auto& [key_str, point_array] : points.items())
                 {
                     int x,y;
                     if (sscanf(key_str.c_str(), "(%d, %d)", &x, &y) == 2) {
@@ -744,7 +788,11 @@ private:
     std::string arm_group_name;
     std::string hand_group_name;
     std::string hand_frame;
+    std::vector<double> cabinet_wdh;
     std::map<std::pair<int,int>,std::vector<double>> cabinet_points_map;
+
+    // 参数
+    std::string config_path;
 
     std::shared_ptr<tf2_ros::Buffer> tf_buffer;
     std::shared_ptr<tf2_ros::TransformListener> tf_listener;

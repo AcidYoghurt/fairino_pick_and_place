@@ -48,21 +48,74 @@ rclcpp::node_interfaces::NodeBaseInterface::SharedPtr MTCTaskNode::getNodeBaseIn
 
 void MTCTaskNode::setupPlanningScene()
 {
-  moveit_msgs::msg::CollisionObject object;
-  object.id = "object";
-  object.header.frame_id = "world";
-  object.primitives.resize(1);
-  object.primitives[0].type = shape_msgs::msg::SolidPrimitive::CYLINDER;
-  object.primitives[0].dimensions = { 0.1, 0.02 };
-
-  geometry_msgs::msg::Pose pose;
-  pose.position.x = 0.5;
-  pose.position.y = -0.25;
-  pose.orientation.w = 1.0;
-  object.pose = pose;
-
   moveit::planning_interface::PlanningSceneInterface psi;
-  psi.applyCollisionObject(object);
+  {
+    // 创建碰撞物体
+    moveit_msgs::msg::CollisionObject collision_object;
+
+    collision_object.id = "object";
+    collision_object.header.frame_id = "world";
+
+    // 定义形状
+    shape_msgs::msg::SolidPrimitive primitive;
+    primitive.type = shape_msgs::msg::SolidPrimitive::BOX;
+    primitive.dimensions = {0.05, 0.05, 0.05};
+    collision_object.primitives.push_back(primitive);
+
+
+    // 定义位姿
+    geometry_msgs::msg::Pose box_pose;
+    box_pose.position.x = -0.4;
+    box_pose.position.y = -0.4;
+    box_pose.position.z = 0.0;
+    tf2::Quaternion orientation;
+    orientation.setRPY(0, 0, M_PI / 4);
+    box_pose.orientation = tf2::toMsg(orientation);
+    collision_object.pose = box_pose;
+
+    geometry_msgs::msg::Pose primitive_pose;
+    primitive_pose.orientation.w = 1.0;
+    collision_object.primitive_poses.push_back(primitive_pose);
+
+    // 添加到场景
+    collision_object.operation = collision_object.ADD;
+    psi.applyCollisionObject(collision_object);
+    rclcpp::sleep_for(std::chrono::milliseconds(500));
+  }
+
+  {
+    // 创建碰撞物体
+    moveit_msgs::msg::CollisionObject collision_object;
+
+    collision_object.id = "cabinet";
+    collision_object.header.frame_id = "world";
+
+    // 定义形状
+    shape_msgs::msg::SolidPrimitive primitive;
+    primitive.type = shape_msgs::msg::SolidPrimitive::BOX;
+    primitive.dimensions = {0.10, 0.10, 0.04};
+    collision_object.primitives.push_back(primitive);
+
+
+    // 定义位姿
+    geometry_msgs::msg::Pose box_pose;
+    box_pose.position.x = 0.4;
+    box_pose.position.y = 0.4;
+    box_pose.position.z = 0.4;
+    tf2::Quaternion orientation;
+    orientation.setRPY(0, 0, 0);
+    box_pose.orientation = tf2::toMsg(orientation);
+    collision_object.pose = box_pose;
+
+    geometry_msgs::msg::Pose primitive_pose;
+    primitive_pose.orientation.w = 1.0;
+    collision_object.primitive_poses.push_back(primitive_pose);
+
+    // 添加到场景
+    collision_object.operation = collision_object.ADD;
+    psi.applyCollisionObject(collision_object);
+    rclcpp::sleep_for(std::chrono::milliseconds(500));
+  }
 }
 
 void MTCTaskNode::doTask()
@@ -102,7 +155,7 @@ mtc::Task MTCTaskNode::createTask()
   task.stages()->setName("demo task");
   task.loadRobotModel(node_);
 
-  const auto& arm_group_name = "fairino5_v6_group";
+  const auto& arm_group_name = "arm";
   const auto& hand_group_name = "hand";
   const auto& hand_frame = "tool_frame";
 

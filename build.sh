@@ -4,3 +4,6 @@ colcon build --symlink-install
 
 # 编译特定包
 # colcon build --symlink-install --packages-select
+
+# 限制线程
+# colcon build --symlink-install --parallel-workers 1

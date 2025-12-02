@@ -24,14 +24,14 @@ arm_controller:
       - j5
       - j6
     command_interfaces:
-      - position
+      []
     state_interfaces:
-      - position
+      []
 hand_controller:
   ros__parameters:
     joints:
       - gripper_joint1_left
     command_interfaces:
-      - position
+      []
     state_interfaces:
-      - position
+      []

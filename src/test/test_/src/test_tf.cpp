@@ -3,19 +3,19 @@
 #include "tf2/LinearMath/Quaternion.h"
 #include "tf2_ros/static_transform_broadcaster.h"
 
-class StaticTFBroadcaster : public rclcpp::Node
+class FairinoRos2TF : public rclcpp::Node
 {
 public:
-    StaticTFBroadcaster() : Node("static_tf_broadcaster")
+    FairinoRos2TF() : Node("static_tf_broadcaster")
     {
         // 初始化静态TF广播器
         broadcaster_ = std::make_shared<tf2_ros::StaticTransformBroadcaster>(this);
         // 发布静态变换
-        publish_static_tf();
+        publish_tf();
     }
 
 private:
-    void publish_static_tf()
+    void publish_tf()
     {
         // 创建TransformStamped消息
         geometry_msgs::msg::TransformStamped transform;
@@ -51,7 +51,7 @@ private:
 int main(int argc, char **argv)
 {
     rclcpp::init(argc, argv);
-    auto node = std::make_shared<StaticTFBroadcaster>();
+    auto node = std::make_shared<FairinoRos2TF>();
     rclcpp::spin(node);
     rclcpp::shutdown();
     return 0;

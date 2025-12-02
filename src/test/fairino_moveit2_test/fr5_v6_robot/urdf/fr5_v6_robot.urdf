@@ -735,4 +735,11 @@
       multiplier="1"
       offset="0" />
   </joint>
+
+  <link name="tool_frame" />
+  <joint name="tool_joint" type="fixed">
+    <origin xyz="0 0 0.15" rpy="0 0 0" />
+    <parent link="wrist3_link" />
+    <child link="tool_frame" />
+  </joint>
 </robot>

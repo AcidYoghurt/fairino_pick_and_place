@@ -13,7 +13,7 @@ def declare_parameters():
 
     robot_name_param = DeclareLaunchArgument(
         'robot_name',
-        default_value='fairino5',
+        default_value='fr5_v6_robot',
         description="机器人名称"
     )
 
@@ -21,7 +21,7 @@ def declare_parameters():
 
 def mtc_node(context):
     robot_name = context.launch_configurations['robot_name']
-    moveit_config = MoveItConfigsBuilder(robot_name=robot_name, package_name=robot_name + "_v6_moveit2_config").to_dict()
+    moveit_config = MoveItConfigsBuilder(robot_name=robot_name, package_name="fr5_moveit2").to_dict()
 
     mtc_node = Node(
         package="test_",
