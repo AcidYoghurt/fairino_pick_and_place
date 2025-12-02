@@ -1,0 +1,7 @@
+/**:
+  ros__parameters:
+    server_ip: "127.0.0.1"
+    server_port: 9000
+    heartbeat_interval: 5
+    deviceId: "000000"
+    deviceName: "robotic_arm_01"

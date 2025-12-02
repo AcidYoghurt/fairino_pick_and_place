@@ -1,0 +1,8 @@
+/**:
+  ros__parameters:
+    tool_frame_name: "tool_frame"
+    tool_frame_parent: "wrist3_link"
+    tool_frame_length: 0.16   # 单位为m
+    roll: 0.0
+    pitch: 0.0
+    yaw: -0.12217304764

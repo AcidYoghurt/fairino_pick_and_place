@@ -1,0 +1,12 @@
+<link name="cabinet">
+    <visual>
+        <geometry>
+            <mesh filename="package://test_/meshes/cabinet.STL"/>
+        </geometry>
+    </visual>
+    <collision>
+        <geometry>
+            <mesh filename="package://test_/meshes/cabinet.STL"/>
+        </geometry>
+    </collision>
+</link>

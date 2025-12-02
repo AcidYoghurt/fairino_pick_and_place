@@ -1,0 +1,19 @@
+/**:
+  ros__parameters:
+    # 柜子右下角原点（单位为m）
+    cabinet_origin: [0.311, 0.736, 0.45]
+
+    # 柜子的数量
+    horizontal_cabinet_num: 10
+    vertical_cabinet_num: 10
+
+    # 柜子的宽深高
+    cabinet_width: 0.3
+    cabinet_depth: 0.4
+    cabinet_height: 0.2
+
+    # 水平隔板高度
+    horizontal_partition_height: 0.2
+
+    # 垂直隔板宽度
+    vertical_partition_width: 0.2

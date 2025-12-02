@@ -1,0 +1,5 @@
+/**:
+  ros__parameters:
+    robot_name: "fairino5"
+    # box的xyz分别对应wdh
+    box_WDH: [0.5,0.2,0.1]

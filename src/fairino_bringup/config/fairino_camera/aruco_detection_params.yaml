@@ -1,0 +1,14 @@
+/**:
+  ros__parameters:
+    # 基础参数配置
+    save_directory: "out/camera_output"
+    upload_url: "http://192.168.58.161:8090/device_file/upload"
+
+    # ArUco 碰撞检测参数
+    marker_length: 0.05
+    x_axis_cargo_buffer_m: 0.02
+    x_axis_grip_allowance_m: 0.045
+    y_axis_check_half_width_m: 0.03
+    depth_similarity_tolerance_m: 0.05
+    obstacle_in_front_margin_m: 0.05
+    target_frame: "base_link"

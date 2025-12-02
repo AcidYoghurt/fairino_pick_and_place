@@ -1,0 +1,20 @@
+parameters:
+  name: eye_in_hand_calibrate
+  calibration_type: eye_in_hand
+  robot_base_frame: base_link
+  robot_effector_frame: wrist3_link
+  tracking_base_frame: camera_link
+  tracking_marker_frame: aruco_marker_frame
+  freehand_robot_movement: true
+  move_group_namespace: /
+  move_group: manipulator
+transform:
+  translation:
+    x: -0.011110168841816204
+    y: -0.11720702039162859
+    z: 0.08603309761410197
+  rotation:
+    x: 0.518866008541453
+    y: -0.48498904788818165
+    z: 0.5161920683293806
+    w: 0.4786537759201446
