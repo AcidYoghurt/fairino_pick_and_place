@@ -3,10 +3,10 @@
 	url = https://github.com/AcidYoghurt/aruco_ros.git
 [submodule "src/fairino_camera/easy_handeye2/easy_handeye2_demo"]
 	path = src/fairino_camera/easy_handeye2/easy_handeye2_demo
-	url = https://github.com/AcidYoghurt/easy_handeye2_demo.git
+	url = https://github.com/marcoesposito1988/easy_handeye2_demo.git
 [submodule "src/fairino_camera/easy_handeye2/easy_handeye2"]
 	path = src/fairino_camera/easy_handeye2/easy_handeye2
-	url = https://github.com/AcidYoghurt/easy_handeye2.git
+	url = https://github.com/marcoesposito1988/easy_handeye2.git
 [submodule "src/fairino_camera/machinery_camera_drive/OrbbecSDK_ROS2"]
 	path = src/fairino_camera/machinery_camera_drive/OrbbecSDK_ROS2
 	url = https://github.com/orbbec/OrbbecSDK_ROS2.git
