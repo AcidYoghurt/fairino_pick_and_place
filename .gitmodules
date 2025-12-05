@@ -10,3 +10,6 @@
 [submodule "src/fairino_camera/machinery_camera_drive/OrbbecSDK_ROS2"]
 	path = src/fairino_camera/machinery_camera_drive/OrbbecSDK_ROS2
 	url = https://github.com/orbbec/OrbbecSDK_ROS2.git
+[submodule "src/fairino_control/fairino_machinery/frcobot_ros2"]
+	path = src/fairino_control/fairino_machinery/frcobot_ros2
+	url = https://github.com/AcidYoghurt/frcobot_ros2.git
