@@ -82,14 +82,16 @@ public:
         // QOS策略
         rclcpp::QoS keepLast_qos(rclcpp::KeepLast(100));
         keepLast_qos.reliable();
+        rclcpp::QoS image_qos = rclcpp::SensorDataQoS();
+        rclcpp::QoS state_qos = rclcpp::SensorDataQoS();
 
         client_node_ = rclcpp::Node::make_shared("fairino_client_node");
         tcp_msg_pub_ = this->create_publisher<std_msgs::msg::String>("ros_to_tcp_cmd",keepLast_qos);
         tcp_msg_sub_ = this->create_subscription<std_msgs::msg::String>("tcp_to_ros_cmd",keepLast_qos,std::bind(&FairinoRos2sdkControl::tcp_callback,this,std::placeholders::_1));
-        fairino_nonrt_state_data_sub_ = this->create_subscription<fairino_msgs::msg::RobotNonrtState>("nonrt_state_data", 10, std::bind(&FairinoRos2sdkControl::get_task_status, this, std::placeholders::_1));
+        fairino_nonrt_state_data_sub_ = this->create_subscription<fairino_msgs::msg::RobotNonrtState>("nonrt_state_data", state_qos, std::bind(&FairinoRos2sdkControl::get_task_status, this, std::placeholders::_1));
         fairino_control_client = client_node_->create_client<fairino_msgs::srv::RemoteCmdInterface>("fairino_remote_command_service");
-        item_pose_sub = this->create_subscription<geometry_msgs::msg::PoseStamped>("aruco/pose_base", 10,std::bind(&FairinoRos2sdkControl::item_pose_callback, this, std::placeholders::_1));
-        item_id_sub = this->create_subscription<std_msgs::msg::Int32MultiArray>("aruco/detected_markers",10,std::bind(&FairinoRos2sdkControl::item_id_callback,this,std::placeholders::_1));
+        item_pose_sub = this->create_subscription<geometry_msgs::msg::PoseStamped>("aruco/pose_base", image_qos,std::bind(&FairinoRos2sdkControl::item_pose_callback, this, std::placeholders::_1));
+        item_id_sub = this->create_subscription<std_msgs::msg::Int32MultiArray>("aruco/detected_markers",image_qos,std::bind(&FairinoRos2sdkControl::item_id_callback,this,std::placeholders::_1));
         this->basic_setting();  // 初始化
         RCLCPP_INFO(this->get_logger(),"机械臂控制节点已启动！");
     }

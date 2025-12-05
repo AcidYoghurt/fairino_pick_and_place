@@ -71,23 +71,25 @@ public:
         get_parameter("y_axis_check_half_width_m", y_axis_check_half_width_m_);
 
         // --- 订阅与发布 ---
+        auto image_qos = rclcpp::SensorDataQoS();
+
         camera_info_sub_ = create_subscription<sensor_msgs::msg::CameraInfo>(
-            color_camera_info_topic_, 10,
+            color_camera_info_topic_, image_qos,
             std::bind(&ArucoDetectorNode::cameraInfoCallback, this, std::placeholders::_1));
 
         image_sub_ = create_subscription<sensor_msgs::msg::Image>(
-            color_image_topic_, 10,
+            color_image_topic_, image_qos,
             std::bind(&ArucoDetectorNode::imageCallback, this, std::placeholders::_1));
 
         depth_sub_ = create_subscription<sensor_msgs::msg::Image>(
-            depth_image_topic_, rclcpp::SensorDataQoS(),
+            depth_image_topic_, image_qos,
             std::bind(&ArucoDetectorNode::depthCallback, this, std::placeholders::_1));
 
-        annotated_pub_ = create_publisher<sensor_msgs::msg::Image>("aruco/image", 10);
-        pose_pub_      = create_publisher<geometry_msgs::msg::PoseStamped>("aruco/pose", 10);
-        id_pub_        = create_publisher<std_msgs::msg::Int32MultiArray>("aruco/detected_markers", 10);
-        marker_pub_    = create_publisher<visualization_msgs::msg::Marker>("aruco/marker", 10);
-        collision_pub_ = create_publisher<visualization_msgs::msg::Marker>("aruco/collision_marker", 10);
+        annotated_pub_ = create_publisher<sensor_msgs::msg::Image>("aruco/image", image_qos);
+        pose_pub_      = create_publisher<geometry_msgs::msg::PoseStamped>("aruco/pose", image_qos);
+        id_pub_        = create_publisher<std_msgs::msg::Int32MultiArray>("aruco/detected_markers", image_qos);
+        marker_pub_    = create_publisher<visualization_msgs::msg::Marker>("aruco/marker", image_qos);
+        collision_pub_ = create_publisher<visualization_msgs::msg::Marker>("aruco/collision_marker", image_qos);
 
         dictionary_ = cv::aruco::getPredefinedDictionary(cv::aruco::DICT_5X5_100);
         detector_params_ = cv::aruco::DetectorParameters::create();
