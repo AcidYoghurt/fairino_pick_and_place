@@ -19,12 +19,20 @@ class FairinoGuardThread(Node):
 
     def monitor_ping(self):
         while rclpy.ok():
-            # 建议加上 -W 1 参数设置超时时间，防止ping不通时脚本卡住
-            response = subprocess.run(['ping', '-c', '1', '-W', '1', self._ping_target], stdout=subprocess.PIPE)
+            response = subprocess.run(
+                ['ping', '-c', '1', '-W', '1', self._ping_target],
+                stdout=subprocess.PIPE
+            )
 
             if response.returncode == 0:
-                self.get_logger().info(f"{self._ping_target} 能ping通") # 日志太频繁可以注释掉
-                self.start_launch()
+                self.get_logger().info(f"{self._ping_target} 能ping通")
+
+                # 只有在 launch 尚未启动时，才等待 20 秒
+                if self._process is None:
+                    self.get_logger().info("检测到设备上线，20 秒后启动 launch")
+                    time.sleep(20)
+                    self.start_launch()
+
             else:
                 self.get_logger().warn(f"{self._ping_target} ping不通")
                 self.stop_launch()
