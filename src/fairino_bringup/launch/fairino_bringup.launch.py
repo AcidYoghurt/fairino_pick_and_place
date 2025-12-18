@@ -127,11 +127,13 @@ def fairino_control(context):
 def fairino_camera():
     # 相机驱动
     orbbec_camera_node = IncludeLaunchDescription(
-        XMLLaunchDescriptionSource([PathJoinSubstitution([
-            FindPackageShare('orbbec_camera'),
-            'launch',
-            'gemini.launch.xml'
-        ])]),
+        PythonLaunchDescriptionSource(
+            PathJoinSubstitution([
+                FindPackageShare('orbbec_camera'),
+                'launch',
+                'gemini_330_series.launch.py'
+            ])
+        ),
         launch_arguments={
             'use_sim_time': LaunchConfiguration('use_sim_time'),
             'enable_depth': 'False',
