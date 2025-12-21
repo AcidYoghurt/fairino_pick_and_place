@@ -26,7 +26,7 @@ public:
     {
         last_status.store(1);
         this_status.store(1);
-        machinery_current_pose = std::vector<double>(6);
+        machineryTCP_current_pose = std::vector<double>(6);
         machine_status = SeqState::IDLE;
         is_running=false;
 
@@ -38,26 +38,29 @@ public:
             this->declare_parameter("item_in_car_point",std::vector<double>());
             item_in_car_point = this->get_parameter("item_in_car_point").as_double_array();
 
-            std::string yaml_str;
+            std::vector<std::string> yaml_str;
             this->declare_parameter("cabinet_front_points","");
             this->get_parameter("cabinet_front_points", yaml_str);
-            YAML::Node node = YAML::Load(yaml_str);
-            for (auto pt : node) {
-                cabinet_front_points.push_back(pt.as<std::vector<double>>());
+            for (const auto &s : yaml_str)
+            {
+                auto pt = YAML::Load(s).as<std::vector<double>>();
+                cabinet_front_points.push_back(pt);
             }
 
             this->declare_parameter("cabinet_inside_points","");
             this->get_parameter("cabinet_inside_points", yaml_str);
-            node = YAML::Load(yaml_str);
-            for (auto pt : node) {
-                cabinet_inside_points.push_back(pt.as<std::vector<double>>());
+            for (const auto &s : yaml_str)
+            {
+                auto pt = YAML::Load(s).as<std::vector<double>>();
+                cabinet_front_points.push_back(pt);
             }
 
             this->declare_parameter("cabinet_recognize_points","");
             this->get_parameter("cabinet_recognize_points", yaml_str);
-            node = YAML::Load(yaml_str);
-            for (auto pt : node) {
-                cabinet_recognize_points.push_back(pt.as<std::vector<double>>());
+            for (const auto &s : yaml_str)
+            {
+                auto pt = YAML::Load(s).as<std::vector<double>>();
+                cabinet_front_points.push_back(pt);
             }
 
             // 点在车上的夹爪角度
@@ -75,7 +78,6 @@ public:
             // 夹爪抓取物品时x轴的旋转期望（相对于世界坐标系）
             this->declare_parameter("desired_gripper_rotation_x",std::vector<double>({0,-1,0}));  // 默认值表示此时夹爪的x是世界坐标系的y的负方向
             this->get_parameter("desired_gripper_rotation_x",desired_gripper_rotation_x);
-
         } catch (const std::exception &e)
         {
             RCLCPP_ERROR(this->get_logger(),"获取参数失败，请检查custom_points_config文件里面是否填写double类型的数据，具体错误：%s",e.what());
@@ -84,7 +86,6 @@ public:
         // QOS策略
         rclcpp::QoS keepLast_qos(rclcpp::KeepLast(100));
         keepLast_qos.reliable();
-        rclcpp::QoS image_qos = rclcpp::SensorDataQoS();
         rclcpp::QoS state_qos(rclcpp::KeepLast(10));
         state_qos.reliable();
 
@@ -93,10 +94,9 @@ public:
         tcp_msg_sub_ = this->create_subscription<std_msgs::msg::String>("tcp_to_ros_cmd",keepLast_qos,std::bind(&FairinoRos2sdkControl::tcp_callback,this,std::placeholders::_1));
         fairino_nonrt_state_data_sub_ = this->create_subscription<fairino_msgs::msg::RobotNonrtState>("nonrt_state_data", state_qos, std::bind(&FairinoRos2sdkControl::get_task_status, this, std::placeholders::_1));
         fairino_control_client = client_node_->create_client<fairino_msgs::srv::RemoteCmdInterface>("fairino_remote_command_service");
-        item_pose_sub = this->create_subscription<geometry_msgs::msg::PoseStamped>("aruco/pose_base", image_qos,std::bind(&FairinoRos2sdkControl::item_pose_callback, this, std::placeholders::_1));
-        item_id_sub = this->create_subscription<std_msgs::msg::Int32MultiArray>("aruco/detected_markers",image_qos,std::bind(&FairinoRos2sdkControl::item_id_callback,this,std::placeholders::_1));
+        item_pose_sub = this->create_subscription<geometry_msgs::msg::PoseStamped>("aruco/pose_base", 10,std::bind(&FairinoRos2sdkControl::item_pose_callback, this, std::placeholders::_1));
+        item_id_sub = this->create_subscription<std_msgs::msg::Int32MultiArray>("aruco/detected_markers",10,std::bind(&FairinoRos2sdkControl::item_id_callback,this,std::placeholders::_1));
         this->basic_setting();  // 初始化
-        this->activate_gripper(1,100);
         RCLCPP_INFO(this->get_logger(),"机械臂控制节点已启动！");
     }
 
@@ -230,13 +230,15 @@ private:
                     return;
                 if (!MoveJ(task_id++,action,task_type,item_id_net,cabinet_id,cabinet_front_points[cabinet_id.second][0],cabinet_front_points[cabinet_id.second][1],cabinet_front_points[cabinet_id.second][2],cabinet_point_posture[0],cabinet_point_posture[1],cabinet_point_posture[2],30))   // 去到柜子前
                     return;
-                // TODO:改为MoveL
-                if (!MoveJ(task_id++,action,task_type,item_id_net,cabinet_id,cabinet_inside_points[cabinet_id.second][0],cabinet_inside_points[cabinet_id.second][1],cabinet_inside_points[cabinet_id.second][2],cabinet_point_posture[0],cabinet_point_posture[1],cabinet_point_posture[2],30))    // 移动到柜子里面（放置物品）
+                // if (!MoveJ(task_id++,action,task_type,item_id_net,cabinet_id,cabinet_inside_points[cabinet_id.second][0]-50,cabinet_inside_points[cabinet_id.second][1],cabinet_inside_points[cabinet_id.second][2],cabinet_point_posture[0],cabinet_point_posture[1],cabinet_point_posture[2],30))    // 移动到柜子里面（放置物品）【中间点】
+                //     return;
+                if (!MoveL(task_id++,action,task_type,item_id_net,cabinet_id,cabinet_inside_points[cabinet_id.second][0],cabinet_inside_points[cabinet_id.second][1],cabinet_inside_points[cabinet_id.second][2],cabinet_point_posture[0],cabinet_point_posture[1],cabinet_point_posture[2],30))    // 移动到柜子里面（放置物品）
                     return;
                 if (!ControlGripper(action,task_type,item_id_net,cabinet_id,1,100))  // 打开夹爪
                     return;
-                // TODO:改为MoveL
-                if (!MoveJ(task_id++,action,task_type,item_id_net,cabinet_id,cabinet_front_points[cabinet_id.second][0],cabinet_front_points[cabinet_id.second][1],cabinet_front_points[cabinet_id.second][2],cabinet_point_posture[0],cabinet_point_posture[1],cabinet_point_posture[2],30))  // 出去柜子
+                // if (!MoveJ(task_id++,action,task_type,item_id_net,cabinet_id,cabinet_inside_points[cabinet_id.second][0]-50,cabinet_inside_points[cabinet_id.second][1],cabinet_inside_points[cabinet_id.second][2],cabinet_point_posture[0],cabinet_point_posture[1],cabinet_point_posture[2],30))    // 移动到柜子里面（放置物品）【中间点】
+                //     return;
+                if (!MoveL(task_id++,action,task_type,item_id_net,cabinet_id,cabinet_front_points[cabinet_id.second][0],cabinet_front_points[cabinet_id.second][1],cabinet_front_points[cabinet_id.second][2],cabinet_point_posture[0],cabinet_point_posture[1],cabinet_point_posture[2],30))  // 出去柜子
                     return;
                 if (!MoveJ(task_id++,action,task_type,item_id_net,cabinet_id,item_above_car_point[0],item_above_car_point[1],item_above_car_point[2],car_point_posture[0],car_point_posture[1],car_point_posture[2],30))     // 去到小车上
                     return;
@@ -316,12 +318,12 @@ private:
     // 获取任务状态
     void get_task_status(fairino_msgs::msg::RobotNonrtState msg)
     {
-        machinery_current_pose[0] = msg.cart_x_cur_pos;
-        machinery_current_pose[1] = msg.cart_y_cur_pos;
-        machinery_current_pose[2] = msg.cart_z_cur_pos;
-        machinery_current_pose[3] = msg.cart_a_cur_pos;
-        machinery_current_pose[4] = msg.cart_b_cur_pos;
-        machinery_current_pose[5] = msg.cart_c_cur_pos;
+        machineryTCP_current_pose[0] = msg.cart_x_cur_pos;
+        machineryTCP_current_pose[1] = msg.cart_y_cur_pos;
+        machineryTCP_current_pose[2] = msg.cart_z_cur_pos;
+        machineryTCP_current_pose[3] = msg.cart_a_cur_pos;
+        machineryTCP_current_pose[4] = msg.cart_b_cur_pos;
+        machineryTCP_current_pose[5] = msg.cart_c_cur_pos;
 
         last_status.store(this_status.load());
         this_status.store(msg.robot_motion_done & msg.grip_motion_done);
@@ -330,10 +332,10 @@ private:
         else if (last_status.load()==1 && this_status.load()==0)
             machine_status.store(SeqState::BUSY);
 
-        if (machine_status.load()==SeqState::IDLE)
-            RCLCPP_INFO(this->get_logger(),"任务状态：IDLE");
-        else if (machine_status.load()==SeqState::BUSY)
-            RCLCPP_INFO(this->get_logger(),"任务状态：BUSY");
+        // if (machine_status.load()==SeqState::IDLE)
+        //     RCLCPP_INFO(this->get_logger(),"任务状态：IDLE");
+        // else if (machine_status.load()==SeqState::BUSY)
+        //     RCLCPP_INFO(this->get_logger(),"任务状态：BUSY");
     }
 
     // 获取要抓取的物品 id 和 位姿
@@ -384,9 +386,9 @@ private:
     {
         // 比较位置 (欧氏距离)
         double pos_diff = std::sqrt(
-            std::pow(machinery_current_pose[0] - x, 2) +
-            std::pow(machinery_current_pose[1] - y, 2) +
-            std::pow(machinery_current_pose[2] - z, 2)
+            std::pow(machineryTCP_current_pose[0] - x, 2) +
+            std::pow(machineryTCP_current_pose[1] - y, 2) +
+            std::pow(machineryTCP_current_pose[2] - z, 2)
         );
 
         if (pos_diff > pos_threshold_mm) {
@@ -395,7 +397,7 @@ private:
         }
 
         // 3. 比较姿态 (RX, RY, RZ) - 处理 ±180 度跳变问题
-        double diff = machinery_current_pose[3] - rx;
+        double diff = machineryTCP_current_pose[3] - rx;
         // 将误差归一化到 [-180, 180] 区间
         while (diff > 180.0) diff -= 360.0;
         while (diff < -180.0) diff += 360.0;
@@ -404,7 +406,7 @@ private:
             return false;
         }
 
-        diff = machinery_current_pose[4] - ry;
+        diff = machineryTCP_current_pose[4] - ry;
         // 将误差归一化到 [-180, 180] 区间
         while (diff > 180.0) diff -= 360.0;
         while (diff < -180.0) diff += 360.0;
@@ -413,7 +415,7 @@ private:
             return false;
         }
 
-        diff = machinery_current_pose[5] - rz;
+        diff = machineryTCP_current_pose[5] - rz;
         // 将误差归一化到 [-180, 180] 区间
         while (diff > 180.0) diff -= 360.0;
         while (diff < -180.0) diff += 360.0;
@@ -519,7 +521,7 @@ private:
                 }
                 try_count++;
             }
-            if (try_count>=5)
+            if (try_count>=2)
             {
                 RCLCPP_ERROR(this->get_logger(),"超过最大尝试次数，任务失败！");
                 sendTcpMsg(400,action,"超过最大尝试次数，任务失败！",task_type,item_id_net,cabinet_id);
@@ -550,7 +552,7 @@ private:
                 }
                 try_count++;
             }
-            if (try_count>=5)
+            if (try_count>=2)
             {
                 RCLCPP_ERROR(this->get_logger(),"超过最大尝试次数，任务失败！");
                 sendTcpMsg(400,action,"超过最大尝试次数，任务失败！",task_type,item_id_net,cabinet_id);
@@ -576,10 +578,7 @@ private:
                     auto response = future.get();
                     std::string temp_a = response->cmd_res;
                     if (temp_a=="0")
-                    {
-
                         RCLCPP_INFO(this->get_logger(),"【MoveJ】服务调用成功：%s",temp_a.data());
-                    }
                     else
                     {
                         RCLCPP_INFO(this->get_logger(),"【MoveJ】服务调用失败，错误码：%s",temp_a.data());
@@ -610,7 +609,8 @@ private:
                                 machine_status.store(SeqState::BUSY);
                                 break;
                             }
-                            return true;
+                            else
+                                return true;
                         }
                         reset_all_error(action,task_type,item_id_net,cabinet_id);
                     } else {
@@ -620,6 +620,8 @@ private:
                     if (try_count++ >=2)
                     {
                         sendTcpMsg(400,action,"超过最大尝试次数，任务失败！",task_type,item_id_net,cabinet_id);
+                        if (!compare_machinery_pose(item_above_car_point[0],item_above_car_point[1],item_above_car_point[2],car_point_posture[0],car_point_posture[1],car_point_posture[2]))
+                            MoveJ(1,action,task_type,item_id_net,cabinet_id,item_above_car_point[0],item_above_car_point[1],item_above_car_point[2],car_point_posture[0],car_point_posture[1],car_point_posture[2],30); // 回到小车上
                         return false;
                     }
                 }
@@ -682,8 +684,10 @@ private:
                                 machine_status.store(SeqState::BUSY);
                                 break;
                             }
-                            return true;
+                            else
+                                return true;
                         }
+                        reset_all_error(action,task_type,item_id_net,cabinet_id);
                     } else {
                         RCLCPP_ERROR(this->get_logger(), "【MoveL】服务调用失败");
                     }
@@ -692,6 +696,7 @@ private:
                     {
                         RCLCPP_ERROR(this->get_logger(),"超过最大尝试次数，任务失败！");
                         sendTcpMsg(400,action,"超过最大尝试次数，任务失败！",task_type,item_id_net,cabinet_id);
+                        MoveJ(1,action,task_type,item_id_net,cabinet_id,item_above_car_point[0],item_above_car_point[1],item_above_car_point[2],car_point_posture[0],car_point_posture[1],car_point_posture[2],30); // 回到小车上
                         return false;
                     }
                 }
@@ -716,7 +721,7 @@ private:
                 auto request = std::make_shared<fairino_msgs::srv::RemoteCmdInterface::Request>();
                 request->cmd_str = "MoveGripper("+std::to_string(gripper_id)+","+std::to_string(open_degree)+")";
                 auto future = fairino_control_client->async_send_request(request);
-                auto result = rclcpp::spin_until_future_complete(client_node_, future, std::chrono::seconds(10));
+                auto result = rclcpp::spin_until_future_complete(client_node_, future, std::chrono::seconds(5));
                 if (result == rclcpp::FutureReturnCode::SUCCESS) {
                     auto response = future.get();
                     std::string temp_a=response->cmd_res;
@@ -870,30 +875,37 @@ private:
         IDLE
     };
 
-    std::vector<double> desired_gripper_rotation_x;
-    std::vector<double> item_above_car_point;
-    std::vector<double> item_in_car_point;
-    std::vector<std::vector<double>> cabinet_front_points;
-    std::vector<std::vector<double>> cabinet_inside_points;
-    std::vector<std::vector<double>> cabinet_recognize_points;
-    std::vector<double> car_point_posture;
-    std::vector<double> cabinet_point_posture;
+    // 机械臂点位和姿态（从参数服务器获取）
+    std::vector<double> item_above_car_point;   // 物体在车上方的抓取点位（原点）
+    std::vector<double> item_in_car_point;  // 物体在车上的放置点
+    std::vector<double> car_point_posture;  // 原点时夹爪的姿态
+    std::vector<std::vector<double>> cabinet_front_points;  // 机械臂到达柜子前面点位
+    std::vector<std::vector<double>> cabinet_inside_points; // 进入柜子放置物品点位
+    std::vector<std::vector<double>> cabinet_recognize_points;  // 在柜子前识别物品点位
+    std::vector<double> cabinet_point_posture;  // 在柜子的夹爪角度
+    std::vector<double> desired_gripper_rotation_x; // 预期夹爪姿态
 
-    std::vector<double> machinery_current_pose;
-    std::atomic<int> last_status;
-    std::atomic<int> this_status;
-    std::atomic<SeqState> machine_status;
-    std::atomic<bool> is_running;
+    // 状态相关
+    std::atomic<int> last_status;              // 上一次从机器人 / SDK 读取到的状态
+    std::atomic<int> this_status;              // 当前机器人 / SDK 状态
+    std::atomic<SeqState> machine_status;      // 核心状态机状态（FSM 当前节点）
+    std::atomic<bool> is_running;              // 是否正在执行一条完整流程（防重入）
+    std::vector<double> machineryTCP_current_pose; // 当前TCP（夹爪）位姿
+
+    // TCP 通信
     rclcpp::Subscription<std_msgs::msg::String>::SharedPtr tcp_msg_sub_;
     rclcpp::Publisher<std_msgs::msg::String>::SharedPtr tcp_msg_pub_;
-    rclcpp::Node::SharedPtr client_node_;
+
+    // Fairino 机器人状态 & 控制接口
     rclcpp::Subscription<fairino_msgs::msg::RobotNonrtState>::SharedPtr fairino_nonrt_state_data_sub_;
     std::shared_ptr<rclcpp::Client<fairino_msgs::srv::RemoteCmdInterface>> fairino_control_client;
+    rclcpp::Node::SharedPtr client_node_;   //独立 client node，专门用于法奥SDK调用（相当于多线程）
 
-    std::mutex item_id_mutex_;
-    std::mutex item_pose_mutex_;
-    int item_id;
-    geometry_msgs::msg::PoseStamped item_pose;
+    // 物品ID与姿态获取
+    int item_id;    // 当前物品ID
+    geometry_msgs::msg::PoseStamped item_pose;  // 当前物品位姿
+    std::mutex item_id_mutex_;  // 物品ID锁
+    std::mutex item_pose_mutex_;    // 物品位姿锁
     rclcpp::Subscription<geometry_msgs::msg::PoseStamped>::SharedPtr item_pose_sub;
     rclcpp::Subscription<std_msgs::msg::Int32MultiArray>::SharedPtr item_id_sub;
 };

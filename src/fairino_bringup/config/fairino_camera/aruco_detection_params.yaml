@@ -4,11 +4,12 @@
     save_directory: "out/camera_output"
     upload_url: "http://192.168.58.161:8090/device_file/upload"
 
-    # ArUco 碰撞检测参数
+    # 优化参数，用于滤波与性能优化
     marker_length: 0.05
-    x_axis_cargo_buffer_m: 0.02
-    x_axis_grip_allowance_m: 0.045
-    y_axis_check_half_width_m: 0.03
-    depth_similarity_tolerance_m: 0.05
-    obstacle_in_front_margin_m: 0.05
+    smoothing_alpha: 0.6
+    stability_window_size: 3
+    stability_position_threshold: 0.05
+    detect_interval: 0.1
+
+    # ArUco 碰撞检测相关参数
     target_frame: "base_link"

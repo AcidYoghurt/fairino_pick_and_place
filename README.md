@@ -89,7 +89,7 @@ ros2 topic pub /tcp_to_ros_cmd std_msgs/msg/String "{data: '{\"code\":200,\"acti
 ```
 ### 右B 主机（黑色）
 ```bash
-# 用户名：zeekeep
+# 用户名：zekeep
 # 密码：1
 192.168.58.142
 ```
