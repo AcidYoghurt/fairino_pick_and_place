@@ -12,4 +12,4 @@
 	url = https://github.com/orbbec/OrbbecSDK_ROS2.git
 [submodule "src/fairino_control/fairino_machinery/frcobot_ros2"]
 	path = src/fairino_control/fairino_machinery/frcobot_ros2
-	url = https://github.com/AcidYoghurt/frcobot_ros2.git
+	url = https://gitee.com/fair-innovation/frcobot_ros2.git
