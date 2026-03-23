@@ -76,7 +76,7 @@ public:
     {
         declare_parameter<std::string>("save_directory", "out/camera_output");
         declare_parameter<std::string>("upload_url", "http://127.0.0.1:8000/upload");
-        declare_parameter<std::string>("deviceId", "1990235585032663041");
+        declare_parameter<std::string>("deviceId", "1993213651076456449");
 
         get_parameter("save_directory", save_directory_);
         get_parameter("upload_url", upload_url_);

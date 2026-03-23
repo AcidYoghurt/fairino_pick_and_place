@@ -45,7 +45,7 @@ public:
             std::bind(&TcpJsonClientNode::sendHeartbeat, this)
         );
 
-        RCLCPP_INFO(get_logger(), "TCP JSON Client Node 已启动");
+        RCLCPP_INFO(get_logger(), "TCP-ROS转换 JSON Client Node 已启动");
     }
 
     ~TcpJsonClientNode()
@@ -95,11 +95,11 @@ private:
             // 1. 优先处理错误重传 (code: 400)
             if (j.contains("code") && j["code"] == 400) {
                 // 打印服务器返回的具体错误信息，方便调试
-                std::string err_msg = j.contains("message") ? j["message"].get<std::string>() : "unknown";
+                std::string err_msg = j.contains("message") ? j["message"].get<std::string>() : "未告知错误信息";
                 RCLCPP_WARN(get_logger(), "收到服务器报错 (code:400): %s. 正在重传...", err_msg.c_str());
-                
+
                 resendLastMessage();
-                return; 
+                return;
             }
 
             // 2. 正常业务逻辑
@@ -115,7 +115,7 @@ private:
             }
 
         } catch (const std::exception &e) {
-            // 这里打印 raw msg，如果再次解析失败，可以看到是哪一段数据出了问题
+            // 这里打印 raw msg，如果解析失败，可以看到是哪一段数据出了问题
             RCLCPP_ERROR(get_logger(), "JSON 解析异常: %s | 原始内容: %s", e.what(), msg.c_str());
         }
     }
@@ -125,10 +125,14 @@ private:
         std::string msg_to_send;
         {
             std::lock_guard<std::mutex> lock(last_msg_mutex_);
-            if (last_sent_msg_.empty()) return;
+            if (last_sent_msg_.empty()){
+                RCLCPP_ERROR(get_logger(), "需要回传，但不存在最后一条信息");
+                return;
+            }
+
             msg_to_send = last_sent_msg_;
         }
-        std::this_thread::sleep_for(std::chrono::milliseconds(100)); // 稍作延时
+        std::this_thread::sleep_for(std::chrono::milliseconds(500)); // 稍作延时
         sendToTcp(msg_to_send);
     }
 
@@ -139,18 +143,24 @@ private:
         while (rclcpp::ok()) {
             if (!connectToServer()) {
                 std::this_thread::sleep_for(std::chrono::seconds(3));
+                RCLCPP_WARN(get_logger(), "连接%s:%d失败，3秒后重试", server_ip_.c_str(), server_port_);
                 continue;
             }
 
+
+
+            // 建立连接后，立马发送一次心跳
+            sendHeartbeat();
+
             // 接收缓冲区
             char buffer[4096];
-            
+
             // 清空之前的残留数据
-            rx_buffer_.clear(); 
+            rx_buffer_.clear();
 
             while (connected_ && rclcpp::ok()) {
                 ssize_t len = recv(sock_, buffer, sizeof(buffer), 0);
-                
+
                 if (len > 0) {
                     // 1. 将收到的原始数据追加到 string buffer 中
                     rx_buffer_.append(buffer, len);
@@ -160,7 +170,7 @@ private:
                     while ((pos = rx_buffer_.find('\n')) != std::string::npos) {
                         // 提取一行完整的 JSON
                         std::string single_msg = rx_buffer_.substr(0, pos);
-                        
+
                         // 从 buffer 中移除已提取的部分 (包括 \n)
                         rx_buffer_.erase(0, pos + 1);
 
@@ -171,7 +181,7 @@ private:
                     }
                     // 此时 rx_buffer_ 中可能残留半条消息（没有 \n 结尾），
                     // 等待下一次 recv 补全它。
-                } 
+                }
                 else if (len == 0) {
                     RCLCPP_WARN(get_logger(), "服务器断开连接");
                     connected_ = false;
@@ -206,9 +216,7 @@ private:
 
         RCLCPP_INFO(get_logger(), "TCP 连接成功");
         connected_ = true;
-        
-        // 可以在这里发个心跳或注册包，但要注意锁的问题
-        // 这里简单返回，让 timer 去发心跳
+        // 在这里发心跳包的话，由于多个函数同时对 sock_ 进行操作，会导致死锁问题
         return true;
     }
 
@@ -216,7 +224,7 @@ private:
     {
         if (!connected_) return;
         std::lock_guard<std::mutex> lock(socket_mutex_);
-        std::string data = msg + "\n"; // 确保发送带换行符
+        std::string data = msg + "\n"; // 确保发送带换行符作为完整消息分隔
         send(sock_, data.c_str(), data.size(), 0);
     }
 
@@ -227,7 +235,7 @@ private:
         std::time_t t = std::chrono::system_clock::to_time_t(now);
         std::tm tm_local = *std::localtime(&t);
         char buf[64];
-        std::strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S", &tm_local);
+        std::strftime(buf, sizeof(buf), "%Y_%m_%d_%H_%M_%S", &tm_local);
         std::string timestamp(buf);
 
         nlohmann::json heartbeat;
@@ -257,8 +265,8 @@ private:
 
     std::string last_sent_msg_;
     std::mutex last_msg_mutex_;
-    
-    //  新增: 接收缓冲区，用于解决粘包问题
+
+    // 接收缓冲区，用于解决粘包问题
     std::string rx_buffer_; 
 };
 

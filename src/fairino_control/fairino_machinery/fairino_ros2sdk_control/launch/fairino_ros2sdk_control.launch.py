@@ -40,17 +40,23 @@ def declare_parameters():
     return [use_sim_time_param,config_path_param]
 
 def ros2sdk_control():
-    ros2sdk_control_node = Node(
-        package="fairino_ros2sdk_control",
-        executable="fairino_ros2sdk_control",
-        output="screen",
-        parameters=[
-            PathJoinSubstitution([LaunchConfiguration('config_path'), 'custom_points_config.yaml']),
-            {'use_sim_time': LaunchConfiguration('use_sim_time')}
-        ],
+    fairino_ros2_cmd_server_node = Node(
+        package="fairino_hardware",
+        executable="ros2_cmd_server",
+        output="screen"
     )
 
-    return [ros2sdk_control_node]
+    ros2sdk_control_node = Node(
+            package="fairino_ros2sdk_control",
+            executable="fairino_ros2sdk_control",
+            output="screen",
+            parameters=[
+                PathJoinSubstitution([LaunchConfiguration('config_path'), 'custom_points_config.yaml']),
+                {'use_sim_time': LaunchConfiguration('use_sim_time')}
+            ],
+        )
+
+    return [fairino_ros2_cmd_server_node,ros2sdk_control_node]
 
 def generate_launch_description():
     declare_parameters_node = declare_parameters()

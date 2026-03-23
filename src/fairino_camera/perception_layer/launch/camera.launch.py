@@ -17,14 +17,51 @@ def generate_launch_description():
         description="文件上传接口地址"
     )
 
-    # --- 2. ArUco 碰撞检测相关参数 (已根据货物尺寸和柜子间隙调整) ---
-    
+    #aruco码宽度（重要，用于深度运算）
     marker_length_arg = DeclareLaunchArgument(
         'marker_length', 
         default_value='0.05', 
         description='ArUco marker side length (m)'
     )
 
+
+    # --- 2. 优化参数，用于滤波与性能优化 ---
+    # 图像滤波参数（用于减少偏移与抖动），出于延迟性需求，建议设置大一些
+    smoothing_alpha_arg = DeclareLaunchArgument(
+        'smoothing_alpha', 
+        default_value='0.6', 
+        description='Smoothing factor for pose filtering (0-1, higher=smoother)'
+    )
+
+
+    #图像帧率窗口判断（需要多少帧确保货物稳定）
+    stability_window_size_arg = DeclareLaunchArgument(
+        'stability_window_size', 
+        default_value='3', 
+        description='Threshold for pose stability check (frames)'
+    )
+
+
+
+
+    #图像稳定性距离判断（用于确保要抓取货物不会发生瞬时偏移）
+    stability_position_threshold_arg = DeclareLaunchArgument(
+        'stability_position_threshold', 
+        default_value='0.05', 
+        description='Threshold for pose stability check (m)'
+    )
+
+
+    #节约资源参数（用于减少解析aruco码资源）
+    detect_interval_arg = DeclareLaunchArgument(
+        'detect_interval', 
+        default_value='0.1', #默认10hz 
+        description='Enable resource saving mode '
+    )
+
+
+    # --- 3. ArUco 碰撞检测相关参数 = ---
+    
     # 货物缓冲距离：排除货物本体和5cm最小净空 (0.07m > 0.06m)
     cargo_buffer_arg = DeclareLaunchArgument(
         'x_axis_cargo_buffer_m', 
@@ -60,7 +97,7 @@ def generate_launch_description():
     )
 
 
-    # --- 3. 节点定义 (保持不变) ---
+    # --- 4. 节点定义  ---
 
     camera_node = Node(
         package="perception_layer",             
@@ -81,11 +118,11 @@ def generate_launch_description():
         name='aruco_detector_node',
         parameters=[{ 
             "marker_length": LaunchConfiguration('marker_length'),
-            "x_axis_cargo_buffer_m": LaunchConfiguration('x_axis_cargo_buffer_m'),
-            "x_axis_grip_allowance_m": LaunchConfiguration('x_axis_grip_allowance_m'),
-            "y_axis_check_half_width_m": LaunchConfiguration('y_axis_check_half_width_m'),
-            "depth_similarity_tolerance_m": LaunchConfiguration('depth_similarity_tolerance_m'),
-            "obstacle_in_front_margin_m": LaunchConfiguration('obstacle_in_front_margin_m'),
+            "smoothing_alpha": LaunchConfiguration('smoothing_alpha'),
+            "stability_window_size": LaunchConfiguration('stability_window_size'),
+            "stability_position_threshold": LaunchConfiguration('stability_position_threshold'),
+            "detect_interval": LaunchConfiguration('detect_interval'),
+            
         }], 
         output='screen'
     ) 
@@ -104,13 +141,23 @@ def generate_launch_description():
         # 参数声明
         save_directory_arg,
         upload_url_arg,
+
+
         marker_length_arg,
+        smoothing_alpha_arg,
+        stability_window_size_arg,
+        stability_position_threshold_arg,
+        detect_interval_arg,
+
+
         cargo_buffer_arg,
         grip_allowance_arg,
         y_width_arg,
         depth_tol_arg,
         front_margin_arg,
         
+
+
         # 节点启动
         Aruco_node,
         Aruco_pose,

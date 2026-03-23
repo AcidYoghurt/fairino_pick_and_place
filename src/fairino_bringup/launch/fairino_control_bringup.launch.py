@@ -51,6 +51,7 @@ def declare_parameters():
     )
 
     return [use_sim_time_param,urdf_path_arg,config_path_param,rviz_path_param]
+
 def ros2sdk_control():
     fairino_ros2_cmd_server_node = Node(
         package="fairino_hardware",
